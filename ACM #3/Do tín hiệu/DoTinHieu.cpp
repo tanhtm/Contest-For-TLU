@@ -1,70 +1,38 @@
 #include <iostream>
-#include <vector>
 using namespace std;
-
-int n,b,minn,maxx=0,idMax=0;
-int tempMax;
-vector<int> array;
-void nhapDuLieu(){
-	cin>>n>>b;
-	maxx=0;
-	for(int i=0;i<n;i++){
-		int x;
-		cin>>x;
-		if(i==0)
-			minn= x;
-		if(x< minn)
-			minn=x;
-		if(x>maxx){
-			maxx= x;
-			idMax=i;
-		}
-		array.push_back(x);
-	}
-}
-void soSanhMax(int any){
-	if(tempMax==-1)
-		tempMax= any;
-	else if(tempMax< any) tempMax= any;
-}
+const int MAXN = 200002;
+int n,b;
+int a[MAXN], L[MAXN], R[MAXN];
+/*
+L[i]:= max(a[1]...a[i]);
+R[i]:= max(a[i]...a[n]);
+*/
 int main()
 {
-	nhapDuLieu();
-	//xuatDuLieu();
-	int min,idMin;
-	int doMax=-1;
-	if(maxx-minn<b){
-		cout<<doMax;
-		return 0;
+	// Input
+	cin>>n>>b;
+	for(int i= 1; i<= n; i++) cin>>a[i];
+	// L[i]
+	L[1] = a[1]; // base
+	for(int i= 2; i<= n; i++){
+		L[i] = a[i];
+		L[i] = max(L[i],L[i-1]);
 	}
-	tempMax= array[0];
-	
-	/// duyet ve trai
-	for(int i=2;i<idMax;i++){
-		min= array[i];
-		soSanhMax(array[i-1]);
-		if(tempMax- b>= min){
-			int x= tempMax+ maxx -2*min;
-			if(x> doMax)
-				doMax= x;
-			//cout<<tempMax<<" "<<maxx<<" "<<min<<" "<<doMax<<endl;
-		}
+	// R[i]
+	R[n] = a[n];
+	for(int i= n-1;i>= 1; i--){
+		R[i] = a[i];
+		R[i] = max(R[i],R[i+1]);
 	}
-	tempMax= array[n-1];
-	for(int i=n-2;i>idMax;i--){
-		min= array[i];
-		soSanhMax(array[i+1]);
-		if(tempMax- b>= min){
-			int x= tempMax+ maxx -2*min;
-			if(x> doMax)
-				doMax= x;
-			//cout<<tempMax<<" "<<maxx<<" "<<min<<" "<<doMax<<endl;
-		}
+	// solve
+	int res = -1; 
+	for(int i= 2;i<= n-1; i++){
+		// cut at i
+		int l = L[i-1] - a[i];
+		int r = R[i-1] - a[i];
+		if(l < b || r < b) continue;
+		res = max(res,l+ r);
 	}
-	cout<<doMax;
+	cout<<res<<endl;
 	return 0;
-	/*
-	10 5
-	3 5 4 7 2 5 4 6 9 8
-	*/
 }
